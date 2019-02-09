@@ -1,5 +1,10 @@
 import sys, os, shutil, binascii, urllib.request, zipfile, linecache
 
+# Must be in game root folder.
+if not os.path.isfile('Ace7Game.exe'):
+    wait = input('Ace7Game.exe not found in this folder. Press any key to close...')
+    sys.exit(0)
+
 # Get desired resolution from user.
 res_hex = ''
 while res_hex == '':
@@ -51,6 +56,8 @@ if not os.path.isfile(tdm_zip):
 zip_ref = zipfile.ZipFile(tdm_zip, 'r')
 zip_ref.extractall(tdm_dir)
 zip_ref.close()
+
+os.remove(tdm_zip)
 
 # Copy files from x64 folder to game root folder.
 for item in os.listdir(tdm_dir + '/x64'):
