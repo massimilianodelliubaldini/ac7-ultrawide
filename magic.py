@@ -1,4 +1,4 @@
-import sys, os, shutil, binascii, urllib.request, zipfile, linecache
+import sys, os, shutil, binascii, urllib.request, zipfile
 
 # Must be in game root folder.
 if not os.path.isfile('Ace7Game.exe'):
@@ -6,8 +6,8 @@ if not os.path.isfile('Ace7Game.exe'):
     sys.exit(0)
 
 # Get desired resolution from user.
-res_hex = ''
-while res_hex == '':
+fov_hex = ''
+while fov_hex == '':
     print('Please select a resolution:')
     print('1: 2560x1080')
     print('2: 3440x1440')
@@ -17,15 +17,15 @@ while res_hex == '':
     res = input('')
 
     if res == '1':
-        res_hex = 'AA05333C'
+        fov_hex = 'AA05333C'
     elif res == '2':
-        res_hex = 'EDD1333C'
+        fov_hex = 'EDD1333C'
     elif res == '3':
-        res_hex = 'FCCF653C'
+        fov_hex = 'FCCF653C'
     elif res == '4':
-        res_hex = '707B8B3C'
+        fov_hex = '707B8B3C'
     elif res == '5':
-        res_hex = '35FA0E3C'
+        fov_hex = '35FA0E3C'
     else:
         print('Invalid selection.')
 
@@ -33,14 +33,14 @@ while res_hex == '':
 if not os.path.isfile('Ace7Game.exe_orig'):
     shutil.copy2('Ace7Game.exe','Ace7Game.exe_orig')
 
-# Overwrite resolution values in game exe.
+# Overwrite FOV value in game exe.
 with open('Ace7Game.exe','rb+') as exe:
 
     exe.seek(int('0A03E32A', 16)) # address to remove black bars
     exe.write(binascii.a2b_hex('00'))
 
-    exe.seek(int('03763968', 16)) # address of resolution
-    exe.write(binascii.a2b_hex(res_hex))
+    exe.seek(int('02534658', 16)) # address of field of view
+    exe.write(binascii.a2b_hex(fov_hex))
     
     exe.close()
 
