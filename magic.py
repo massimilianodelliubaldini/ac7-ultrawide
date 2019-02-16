@@ -1,4 +1,4 @@
-import sys, os, shutil, binascii, urllib.request, zipfile
+import sys, os, shutil, binascii, urllib.request, zipfile, ctypes, math
 
 # Must be in game root folder.
 if not os.path.isfile('Ace7Game.exe'):
@@ -79,12 +79,22 @@ with open('d3dx.ini','r+') as ini:
     ini.close()
 
 # Download shader fix.
-sf_url = 'https://gist.githubusercontent.com/martinsstuff/7ae3b02360478c72d2c696f5f96b8bb4/raw/e7b421b718c34e36b504c0612d2df5d440e3b27a/9958a636cbef5557-ps_replace.txt'
+sf_url = 'https://gist.githubusercontent.com/martinsstuff/7ae3b02360478c72d2c696f5f96b8bb4/raw/4d8254987f23392c4f05a032f44f7583d90c4db6/9958a636cbef5557-ps_replace.txt'
 sf_txt = sf_url[sf_url.rfind('/')+1:]
+urllib.request.urlretrieve(sf_url, 'ShaderFixes/' + sf_txt)
 
-if not os.path.isfile(sf_txt):
-    urllib.request.urlretrieve(sf_url, 'ShaderFixes/' + sf_txt)
+# Modify shader fix for resolution width.
+u32 = ctypes.windll.user32
+u32.SetProcessDPIAware()
 
+res_w = u32.GetSystemMetrics(0)
+res_x = '0.' + str(math.floor(res_w / 2))
 
+with open('ShaderFixes/' + sf_txt,'r+') as sf:
+    
+    sf.seek(965) # number of bytes to r1.x
+    sf.write('  r1.x -= ' + res_x + ';')
+
+    sf.close()
 
 wait = input('Press any key to close...')
