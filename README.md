@@ -14,10 +14,10 @@ Prerequisites:
 
 Installation: 
 
-1. Save magic.py to <Steam Installation Location>\SteamApps\common\ACE COMBAT 7.
+1. Save magic.py to \<Steam Installation Location\>\SteamApps\common\ACE COMBAT 7.
 2. Double click to run.
 
 TODO:
 
-1. Apply FOV fix automatically.
+1. Continue using most-up-to-date shader fixes.
 
