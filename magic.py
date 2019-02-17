@@ -87,13 +87,15 @@ urllib.request.urlretrieve(sf_url, 'ShaderFixes/' + sf_txt)
 u32 = ctypes.windll.user32
 u32.SetProcessDPIAware()
 
-res_w = u32.GetSystemMetrics(0)
-res_x = '0.' + str(math.floor(res_w / 2))
+[res_w, res_h] = [u32.GetSystemMetrics(0), u32.GetSystemMetrics(1)]
+res_w = res_w * (1080 / res_h)
+res_x = (res_w - 1920) / 3840 # (x/1920)/2 = x/3840
+res_x = round(res_x, 4)
 
 with open('ShaderFixes/' + sf_txt,'r+') as sf:
     
     sf.seek(965) # number of bytes to r1.x
-    sf.write('  r1.x -= ' + res_x + ';')
+    sf.write('  r1.x -= ' + str(res_x) + ';')
 
     sf.close()
 
