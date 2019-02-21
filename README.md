@@ -3,10 +3,10 @@ Mod AC7 to work at ultrawide resolutions.
 
 What it does:
 
-1. Prompts user for input on the resolution they want to use.
-2. Hex edits the executable to the chosen resolution.
+1. Determines the resolution of the user's monitor(s).
+2. Hex edits the executable to the determined resolution.
 3. Downloads 3Dmigoto and unpacks it into the game directory.
-4. Downloads the shader fix file.
+4. Downloads the shader files and modifies them for the correct position.
 
 Prerequisites:
 
