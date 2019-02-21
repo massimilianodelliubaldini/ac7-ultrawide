@@ -98,22 +98,42 @@ with open('d3dx.ini','r+') as ini:
 
     ini.close()
 
-# Download shader fix.
-print('Downloading shader fixes...')
-sf_url = 'https://gist.githubusercontent.com/martinsstuff/7ae3b02360478c72d2c696f5f96b8bb4/raw/4d8254987f23392c4f05a032f44f7583d90c4db6/9958a636cbef5557-ps_replace.txt'
-sf_txt = sf_url[sf_url.rfind('/')+1:]
-urllib.request.urlretrieve(sf_url, 'ShaderFixes/' + sf_txt)
+# Set up shader filenames.
+github_url = 'https://raw.githubusercontent.com/mpm11011/ac7-ultrawide/master/ShaderFixes/'
+hud_filename = '9958a636cbef5557-ps_replace.txt'
+map_filename = 'e6f41464a78a35c4-ps_replace.txt'
+char_filename = 'f355a6eae7adfe8e-ps_replace.txt'
+
+# Download shaders.
+print('Downloading shader files...')
+urllib.request.urlretrieve(github_url + hud_filename, 'ShaderFixes/' + hud_filename)
+urllib.request.urlretrieve(github_url + map_filename, 'ShaderFixes/' + map_filename)
+urllib.request.urlretrieve(github_url + char_filename, 'ShaderFixes/' + char_filename)
 
 # Modify shader fix for resolution width.
-print('Modifying shader fixes for resolution...')
-hud_x = (res_x - 1920) / 3840 # divide by 1920, then divide by 2.
-hud_x = round(hud_x, 4)
+print('Modifying shader files for resolution...')
+delta_x = (res_x - 1920) / 3840 # divide by 1920, then divide by 2.
+delta_x = round(delta_x, 4)
 
-with open('ShaderFixes/' + sf_txt,'r+') as sf:
+with open('ShaderFixes/' + hud_filename,'r+') as hud_file:
     
-    sf.seek(965) # number of bytes to r1.x
-    sf.write('  r1.x -= ' + str(hud_x) + ';')
+    hud_file.seek(769) # number of bytes to line needing change
+    hud_file.write('  r1.x -= ' + str(delta_x) + ';')
 
-    sf.close()
+    hud_file.close()
+
+with open('ShaderFixes/' + map_filename,'r+') as map_file:
+    
+    map_file.seek(1035) # number of bytes to line needing change
+    map_file.write('  r0.x -= ' + str(delta_x) + ';')
+
+    map_file.close()
+
+with open('ShaderFixes/' + char_filename,'r+') as char_file:
+    
+    char_file.seek(1035) # number of bytes to line needing change
+    char_file.write('  r0.x -= ' + str(delta_x) + ';')
+
+    char_file.close()
 
 wait = input('Script complete. Press any key to close.')
