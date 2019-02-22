@@ -103,12 +103,16 @@ github_url = 'https://raw.githubusercontent.com/mpm11011/ac7-ultrawide/master/Sh
 hud_filename = '9958a636cbef5557-ps_replace.txt'
 map_filename = 'e6f41464a78a35c4-ps_replace.txt'
 char_filename = 'f355a6eae7adfe8e-ps_replace.txt'
+map_m7_filename = '27f3e07e177ddf67-ps_replace.txt'
+char_m7_filename = 'f904af6042b80b52-ps_replace.txt'
 
 # Download shaders.
 print('Downloading shader files...')
 urllib.request.urlretrieve(github_url + hud_filename, 'ShaderFixes/' + hud_filename)
 urllib.request.urlretrieve(github_url + map_filename, 'ShaderFixes/' + map_filename)
 urllib.request.urlretrieve(github_url + char_filename, 'ShaderFixes/' + char_filename)
+urllib.request.urlretrieve(github_url + map_m7_filename, 'ShaderFixes/' + map_m7_filename)
+urllib.request.urlretrieve(github_url + char_m7_filename, 'ShaderFixes/' + char_m7_filename)
 
 # Modify shader fix for resolution width.
 print('Modifying shader files for resolution...')
@@ -135,5 +139,21 @@ with open('ShaderFixes/' + char_filename,'r+') as char_file:
     char_file.write('  r0.x -= ' + str(delta_x) + ';')
 
     char_file.close()
+
+with open('ShaderFixes/' + map_m7_filename,'r+') as map_m7_file:
+    
+    map_m7_file.seek(1038) # number of bytes to line needing change
+    map_m7_file.write('  r1.x -= ' + str(delta_x) + ';')
+
+    map_m7_file.close()
+
+with open('ShaderFixes/' + char_m7_filename,'r+') as char_m7_file:
+    
+    char_m7_file.seek(1038) # number of bytes to line needing change
+    char_m7_file.write('  r1.x -= ' + str(delta_x) + ';')
+
+    char_m7_file.close()
+
+
 
 wait = input('Script complete. Press any key to close.')
