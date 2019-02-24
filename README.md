@@ -10,7 +10,7 @@ What it does:
 
 Prerequisites:
 
-1. [Python 3.5 or newer](https://www.python.org/downloads/)
+1. [Python 3.5 or newer](https://www.python.org/downloads/) (Make sure you allow it to modify your Windows PATH environment variable upon installation)
 
 Installation: 
 
