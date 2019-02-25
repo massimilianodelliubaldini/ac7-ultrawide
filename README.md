@@ -20,4 +20,8 @@ Installation:
 TODO:
 
 1. Continue using most-up-to-date shader fixes.
+2. Add subtitles fix.
+3. Fix MP HUD.
+4. Fix menus.
+
 
