@@ -105,6 +105,10 @@ map_filename = 'e6f41464a78a35c4-ps_replace.txt'
 char_filename = 'f355a6eae7adfe8e-ps_replace.txt'
 map_m7_filename = '27f3e07e177ddf67-ps_replace.txt'
 char_m7_filename = 'f904af6042b80b52-ps_replace.txt'
+mp_hud_filename = '6dcdbf6042a8a27a-ps_replace.txt'
+mp_pause_filename = 'c75a35eef5821976-ps_replace.txt'
+mp_map_filename = 'ec51646d13b1fd16-ps_replace.txt'
+subtitles_filename = 'da86a094e768f000-vs_replace.txt'
 
 # Download shaders.
 print('Downloading shader files...')
@@ -113,6 +117,11 @@ urllib.request.urlretrieve(github_url + map_filename, 'ShaderFixes/' + map_filen
 urllib.request.urlretrieve(github_url + char_filename, 'ShaderFixes/' + char_filename)
 urllib.request.urlretrieve(github_url + map_m7_filename, 'ShaderFixes/' + map_m7_filename)
 urllib.request.urlretrieve(github_url + char_m7_filename, 'ShaderFixes/' + char_m7_filename)
+urllib.request.urlretrieve(github_url + mp_hud_filename, 'ShaderFixes/' + mp_hud_filename)
+urllib.request.urlretrieve(github_url + mp_pause_filename, 'ShaderFixes/' + mp_pause_filename)
+urllib.request.urlretrieve(github_url + mp_map_filename, 'ShaderFixes/' + mp_map_filename)
+urllib.request.urlretrieve(github_url + subtitles_filename, 'ShaderFixes/' + subtitles_filename)
+
 
 # Modify shader fix for resolution width.
 print('Modifying shader files for resolution...')
@@ -154,6 +163,38 @@ with open('ShaderFixes/' + char_m7_filename,'r+') as char_m7_file:
 
     char_m7_file.close()
 
+with open('ShaderFixes/' + mp_hud_filename,'r+') as mp_hud_file:
+    
+    mp_hud_file.seek(769) # number of bytes to line needing change
+    mp_hud_file.write('  r1.x -= ' + str(delta_x) + ';')
 
+    mp_hud_file.close()
+
+with open('ShaderFixes/' + mp_pause_filename,'r+') as mp_pause_file:
+    
+    mp_pause_file.seek(1108) # number of bytes to line needing change
+    mp_pause_file.write('  r1.x -= ' + str(delta_x) + ';')
+
+    mp_pause_file.close()
+
+with open('ShaderFixes/' + mp_map_filename,'r+') as mp_map_file:
+    
+    mp_map_file.seek(1108) # number of bytes to line needing change
+    mp_map_file.write('  r1.x -= ' + str(delta_x) + ';')
+
+    mp_map_file.close()
+
+# Modifying subtitles fix for resolution width.
+delta_o = (res_w / 2) - ((8/9) * res_h)
+delta_o = (2 / res_w) * delta_o
+delta_o = round(delta_o, 4)
+
+with open('ShaderFixes/' + subtitles_filename,'r+') as subtitles_file:
+    
+    subtitles_file.seek(1368) # number of bytes to line needing change
+    subtitles_file.write('  o0.x+=' + str(delta_o) + ';')
+
+    subtitles_file.close()
+    
 
 wait = input('Script complete. Press any key to close.')
