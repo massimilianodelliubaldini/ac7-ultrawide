@@ -194,7 +194,7 @@ delta_o = round(delta_o, 4)
 with open('ShaderFixes/' + subtitles_filename,'r+') as subtitles_file:
     
     subtitles_file.seek(1368) # number of bytes to line needing change
-    subtitles_file.write('  o0.x+=' + str(delta_o) + ';')
+    subtitles_file.write('   o0.x+=' + str(delta_o) + ';')
 
     subtitles_file.close()
     
