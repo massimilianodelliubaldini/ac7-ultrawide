@@ -99,7 +99,7 @@ with open('d3dx.ini','r+') as ini:
     ini.close()
 
 # Set up shader filenames.
-github_url = 'https://raw.githubusercontent.com/mpm11011/ac7-ultrawide/master/ShaderFixes/'
+github_url = 'https://raw.githubusercontent.com/mpm11011/ac7-ultrawide/master/'
 hud_filename = '9958a636cbef5557-ps_replace.txt'
 map_filename = 'e6f41464a78a35c4-ps_replace.txt'
 char_filename = 'f355a6eae7adfe8e-ps_replace.txt'
@@ -109,18 +109,20 @@ mp_hud_filename = '6dcdbf6042a8a27a-ps_replace.txt'
 mp_pause_filename = 'c75a35eef5821976-ps_replace.txt'
 mp_map_filename = 'ec51646d13b1fd16-ps_replace.txt'
 subtitles_filename = 'da86a094e768f000-vs_replace.txt'
+subtitles_hud_checker = 'hudtextfix.ini'
 
 # Download shaders.
 print('Downloading shader files...')
-urllib.request.urlretrieve(github_url + hud_filename, 'ShaderFixes/' + hud_filename)
-urllib.request.urlretrieve(github_url + map_filename, 'ShaderFixes/' + map_filename)
-urllib.request.urlretrieve(github_url + char_filename, 'ShaderFixes/' + char_filename)
-urllib.request.urlretrieve(github_url + map_m7_filename, 'ShaderFixes/' + map_m7_filename)
-urllib.request.urlretrieve(github_url + char_m7_filename, 'ShaderFixes/' + char_m7_filename)
-urllib.request.urlretrieve(github_url + mp_hud_filename, 'ShaderFixes/' + mp_hud_filename)
-urllib.request.urlretrieve(github_url + mp_pause_filename, 'ShaderFixes/' + mp_pause_filename)
-urllib.request.urlretrieve(github_url + mp_map_filename, 'ShaderFixes/' + mp_map_filename)
-urllib.request.urlretrieve(github_url + subtitles_filename, 'ShaderFixes/' + subtitles_filename)
+urllib.request.urlretrieve(github_url + 'ShaderFixes/' + hud_filename, 'ShaderFixes/' + hud_filename)
+urllib.request.urlretrieve(github_url + 'ShaderFixes/' + map_filename, 'ShaderFixes/' + map_filename)
+urllib.request.urlretrieve(github_url + 'ShaderFixes/' + char_filename, 'ShaderFixes/' + char_filename)
+urllib.request.urlretrieve(github_url + 'ShaderFixes/' + map_m7_filename, 'ShaderFixes/' + map_m7_filename)
+urllib.request.urlretrieve(github_url + 'ShaderFixes/' + char_m7_filename, 'ShaderFixes/' + char_m7_filename)
+urllib.request.urlretrieve(github_url + 'ShaderFixes/' + mp_hud_filename, 'ShaderFixes/' + mp_hud_filename)
+urllib.request.urlretrieve(github_url + 'ShaderFixes/' + mp_pause_filename, 'ShaderFixes/' + mp_pause_filename)
+urllib.request.urlretrieve(github_url + 'ShaderFixes/' + mp_map_filename, 'ShaderFixes/' + mp_map_filename)
+urllib.request.urlretrieve(github_url + 'ShaderFixes/' + subtitles_filename, 'ShaderFixes/' + subtitles_filename)
+urllib.request.urlretrieve(github_url + 'Mods/' + subtitles_hud_checker, 'Mods/' + subtitles_hud_checker)
 
 
 # Modify shader fix for resolution width.
