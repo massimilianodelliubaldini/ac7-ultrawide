@@ -89,15 +89,6 @@ for item in os.listdir(tdm_dir + '/x64'):
         if not os.path.exists(item):
             shutil.copy2(tdm_item, item)
 
-# Disable shader hunting in config file.
-print('Modifying INI config file...')
-with open('d3dx.ini','r+') as ini:
-    
-    ini.seek(10202) # number of bytes to hunting
-    ini.write('hunting=0')
-
-    ini.close()
-
 # Set up shader filenames.
 github_url = 'https://raw.githubusercontent.com/mpm11011/ac7-ultrawide/master/'
 hud_filename = '9958a636cbef5557-ps_replace.txt'
@@ -110,6 +101,7 @@ mp_pause_filename = 'c75a35eef5821976-ps_replace.txt'
 mp_map_filename = 'ec51646d13b1fd16-ps_replace.txt'
 subtitles_filename = 'da86a094e768f000-vs_replace.txt'
 subtitles_hud_checker = 'hudtextfix.ini'
+ini_filename = 'd3dx.ini'
 
 # Download shaders.
 print('Downloading shader files...')
@@ -123,7 +115,7 @@ urllib.request.urlretrieve(github_url + 'ShaderFixes/' + mp_pause_filename, 'Sha
 urllib.request.urlretrieve(github_url + 'ShaderFixes/' + mp_map_filename, 'ShaderFixes/' + mp_map_filename)
 urllib.request.urlretrieve(github_url + 'ShaderFixes/' + subtitles_filename, 'ShaderFixes/' + subtitles_filename)
 urllib.request.urlretrieve(github_url + 'Mods/' + subtitles_hud_checker, 'Mods/' + subtitles_hud_checker)
-
+urllib.request.urlretrieve(github_url + ini_filename, ini_filename)
 
 # Modify shader fix for resolution width.
 print('Modifying shader files for resolution...')
@@ -187,8 +179,7 @@ with open('ShaderFixes/' + mp_map_filename,'r+') as mp_map_file:
     mp_map_file.close()
 
 # Modifying subtitles fix for resolution width.
-delta_o = (res_w / 2) - ((8/9) * res_h)
-delta_o = (2 / res_w) * delta_o
+delta_o = 1 - ((16/9) * (res_h/res_w))
 delta_o = round(delta_o, 4)
 
 with open('ShaderFixes/' + subtitles_filename,'r+') as subtitles_file:
