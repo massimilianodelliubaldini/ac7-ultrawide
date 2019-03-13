@@ -1,4 +1,4 @@
-import sys, os, shutil, binascii, urllib.request, zipfile, ctypes, math
+import sys, os, shutil, binascii, urllib.request, zipfile, ctypes, math, glob
 
 # Must be in game root folder.
 if not os.path.isfile('Ace7Game.exe'):
@@ -53,29 +53,31 @@ if not os.path.isfile('Ace7Game.exe_orig'):
 print('Modifying the game exe...')
 with open('Ace7Game.exe','rb+') as exe:
 
-    exe.seek(int('0A03E32A', 16)) # address to remove black bars
+    exe.seek(int('0D74E58A', 16)) # address to remove black bars
     exe.write(binascii.a2b_hex('00'))
 
-    exe.seek(int('02534658', 16)) # address of field of view
+    exe.seek(int('02534628', 16)) # address of field of view
     exe.write(binascii.a2b_hex(fov_hex))
     
     exe.close()
 
-# Download 3Dmigoto.
-print('Downloading 3Dmigoto...')
-tdm_url = 'https://github.com/bo3b/3Dmigoto/releases/download/1.3.14/3Dmigoto-1.3.14.zip'
-tdm_zip = tdm_url[tdm_url.rfind('/')+1:]
+# Check for 3Dmigoto zip file.
+print('Checking for 3Dmigoto zip file...')
+tdm_regex = '3Dmigoto-*.zip'
+tdm_list = glob.glob(tdm_regex)
+
+if not tdm_list:
+    print('3Dmigoto zip file not found. Quitting.')
+    sys.exit(0)
+
+tdm_zip = tdm_list[0]
 tdm_dir = tdm_zip[:tdm_zip.rfind('.')]
 
-if not os.path.isfile(tdm_zip):
-    urllib.request.urlretrieve(tdm_url, tdm_zip)
-
 # Unpack 3Dmigoto.
-print('Unpacking 3Dmigoto...')
+print('Unpacking ' + tdm_zip + '...')
 zip_ref = zipfile.ZipFile(tdm_zip, 'r')
 zip_ref.extractall(tdm_dir)
 zip_ref.close()
-os.remove(tdm_zip)
 
 # Copy files from x64 folder to game root folder.
 print('Installing 3Dmigoto...')
@@ -101,7 +103,6 @@ mp_pause_filename = 'c75a35eef5821976-ps_replace.txt'
 mp_map_filename = 'ec51646d13b1fd16-ps_replace.txt'
 subtitles_filename = 'da86a094e768f000-vs_replace.txt'
 subtitles_hud_checker = 'hudtextfix.ini'
-ini_filename = 'd3dx.ini'
 
 # Download shaders.
 print('Downloading shader files...')
@@ -115,7 +116,6 @@ urllib.request.urlretrieve(github_url + 'ShaderFixes/' + mp_pause_filename, 'Sha
 urllib.request.urlretrieve(github_url + 'ShaderFixes/' + mp_map_filename, 'ShaderFixes/' + mp_map_filename)
 urllib.request.urlretrieve(github_url + 'ShaderFixes/' + subtitles_filename, 'ShaderFixes/' + subtitles_filename)
 urllib.request.urlretrieve(github_url + 'Mods/' + subtitles_hud_checker, 'Mods/' + subtitles_hud_checker)
-urllib.request.urlretrieve(github_url + ini_filename, ini_filename)
 
 # Modify shader fix for resolution width.
 print('Modifying shader files for resolution...')
@@ -167,14 +167,14 @@ with open('ShaderFixes/' + mp_hud_filename,'r+') as mp_hud_file:
 with open('ShaderFixes/' + mp_pause_filename,'r+') as mp_pause_file:
     
     mp_pause_file.seek(1108) # number of bytes to line needing change
-    mp_pause_file.write('  r1.x -= ' + str(delta_x) + ';')
+    mp_pause_file.write('  r0.x -= ' + str(delta_x) + ';')
 
     mp_pause_file.close()
 
 with open('ShaderFixes/' + mp_map_filename,'r+') as mp_map_file:
     
     mp_map_file.seek(1108) # number of bytes to line needing change
-    mp_map_file.write('  r1.x -= ' + str(delta_x) + ';')
+    mp_map_file.write('  r0.x -= ' + str(delta_x) + ';')
 
     mp_map_file.close()
 
@@ -188,6 +188,20 @@ with open('ShaderFixes/' + subtitles_filename,'r+') as subtitles_file:
     subtitles_file.write('   o0.x+=' + str(delta_o) + ';')
 
     subtitles_file.close()
+
+# Disable shader hunting and enable Mods folder in config file.
+print('Modifying d3dx.ini...')
+with open('d3dx.ini','r+') as ini:
     
+    ini_data = ini.read()
+    ini.close()
+    
+ini_data = ini_data.replace(';include_recursive = Mods','include_recursive = Mods')
+ini_data = ini_data.replace('hunting=1','hunting=0')
+    
+with open('d3dx.ini','w') as ini:
+    
+    ini.write(ini_data);
+    ini.close()
 
 wait = input('Script complete. Press any key to close.')
