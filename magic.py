@@ -53,10 +53,10 @@ if not os.path.isfile('Ace7Game.exe_orig'):
 print('Modifying the game exe...')
 with open('Ace7Game.exe','rb+') as exe:
 
-    exe.seek(int('0D74E58A', 16)) # address to remove black bars
+    exe.seek(int('0E5AB5FA', 16)) # address to remove black bars
     exe.write(binascii.a2b_hex('00'))
 
-    exe.seek(int('02534628', 16)) # address of field of view
+    exe.seek(int('02534918', 16)) # address of field of view
     exe.write(binascii.a2b_hex(fov_hex))
     
     exe.close()
