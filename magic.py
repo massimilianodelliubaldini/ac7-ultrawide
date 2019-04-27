@@ -91,6 +91,10 @@ for item in os.listdir(tdm_dir + '/x64'):
         if not os.path.exists(item):
             shutil.copy2(tdm_item, item)
 
+# Create Mods folder if it doesn't exist.
+if not os.path.isdir('Mods'):
+    os.mkdir('Mods')
+
 # Set up shader filenames.
 github_url = 'https://raw.githubusercontent.com/mpm11011/ac7-ultrawide/master/'
 hud_filename = '9958a636cbef5557-ps_replace.txt'
