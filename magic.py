@@ -24,21 +24,22 @@ while prompt.lower() != 'y':
         sys.exit(0)
 
 # Determine FOV hex value.
+# First 4 bytes actually determine FOV, last 2 bytes is explained below.
 print('Determining FOV hex value...')
 if res_x in [2560, 2304]: # This value is for 2560x1080, 2560x1200 monitors.
-    fov_hex = 'AA05333C'
+    fov_hex = 'AA 05 33 3C D8 F5'
     
 elif res_x in [2580, 2322]: # This value is for 3440x1440, 3440x1600 monitors.
-    fov_hex = 'EDD1333C'
+    fov_hex = 'ED D1 33 3C D8 F5'
     
 elif res_x in [3840, 3456]: # This value is for dual 16:9, 16:10 monitors.
-    fov_hex = 'FCCF653C'
+    fov_hex = 'FC CF 65 3C D8 F5'
     
 elif res_x in [5760, 5184]: # This value is for triple 16:9, 16:10 monitors.
-    fov_hex = '707B8B3C'
+    fov_hex = '70 7B 8B 3C D8 F5'
     
 elif res_x in [1920, 1728]: # This value is for single 16:9, 16:10 monitors.
-    fov_hex = '35FA0E3C'
+    fov_hex = '35 FA 0E 3C D8 F5'
     
 else:
     print('Unknown resolution or aspect ratio. Quitting.')
@@ -49,17 +50,57 @@ print('Backing up the game exe...')
 if not os.path.isfile('Ace7Game.exe_orig'):
     shutil.copy2('Ace7Game.exe','Ace7Game.exe_orig')
 
-# Overwrite FOV value in game exe.
+# Edit the game exe.
 print('Modifying the game exe...')
 with open('Ace7Game.exe','rb+') as exe:
 
-    exe.seek(int('0E5AB5FA', 16)) # address to remove black bars
-    exe.write(binascii.a2b_hex('00'))
-
-    exe.seek(int('02534918', 16)) # address of field of view
-    exe.write(binascii.a2b_hex(fov_hex))
-    
+    exe_data = exe.read()
     exe.close()
+
+# The value '41 2C 01 4C 89 CB 0F 29' is only found once in the EXE.
+exe_data = exe_data.replace(bytes.fromhex('41 2C 01 4C 89 CB 0F 29'), bytes.fromhex('41 2C 00 4C 89 CB 0F 29')) # Removes black bars.
+
+# '35 FA 0E 3C' is the default FOV value we want to replace, but it is found 6 times in the EXE, and we only want to replace it once. 
+# How do we know which one to replace? 'D8 F5' happens to follow that value at the FOV address, and it doesn't follow any other addresses with the same value.
+# So when we search for '35 FA 0E 3C D8 F5' we only find it once, which is exactly what we need.
+exe_data = exe_data.replace(bytes.fromhex('35 FA 0E 3C D8 F5'), bytes.fromhex(fov_hex)) # Fixes field of view.
+
+with open('Ace7Game.exe','wb') as exe:
+    
+    exe.write(exe_data);
+    exe.close()
+
+# Check to make sure nothing broke by comparing number of bytes modified. Should only be 4.
+print('Verifying the game exe...')
+
+bytes_changed = 0
+address = 0
+with open('Ace7Game.exe','rb+') as exe_new:
+    with open('Ace7Game.exe_orig','rb+') as exe_old:
+
+        exe_new_byte = exe_new.read(1)
+        exe_old_byte = exe_old.read(1)
+
+        while exe_new_byte:
+            if exe_new_byte != exe_old_byte:
+                
+                bytes_changed += 1
+                print('Old byte: ' + str(exe_old_byte) + ', New byte: ' + str(exe_new_byte) + ', at address: ' + str(address))
+
+            exe_new_byte = exe_new.read(1)
+            exe_old_byte = exe_old.read(1)
+
+            address += 1
+
+        exe_old.close()
+    exe_new.close()
+    
+if bytes_changed > 4:
+    print('WARNING: More bytes were changed than expected! Recommend restoring exe from backup and performing those changes manually...')
+elif bytes_changed < 4:
+    print('WARNING: Fewer bytes were changed than expected! Recommend restoring exe from backup and performing those changes manually...')
+else:
+    print('Verification successful.')
 
 # Check for 3Dmigoto zip file.
 print('Checking for 3Dmigoto zip file...')
