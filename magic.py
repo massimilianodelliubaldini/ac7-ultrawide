@@ -1,4 +1,5 @@
 import sys, os, shutil, binascii, urllib.request, zipfile, ctypes, math, glob
+from datetime import datetime
 
 # Must be in game root folder.
 if not os.path.isfile('Ace7Game.exe'):
@@ -47,8 +48,10 @@ else:
 
 # Back up the game exe.
 print('Backing up the game exe...')
+timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+
 if not os.path.isfile('Ace7Game.exe_orig'):
-    shutil.copy2('Ace7Game.exe','Ace7Game.exe_orig')
+    shutil.copy2('Ace7Game.exe','Ace7Game.exe_' + timestamp)
 
 # Edit the game exe.
 print('Modifying the game exe...')
@@ -76,7 +79,7 @@ print('Verifying the game exe...')
 bytes_changed = 0
 address = 0
 with open('Ace7Game.exe','rb+') as exe_new:
-    with open('Ace7Game.exe_orig','rb+') as exe_old:
+    with open('Ace7Game.exe_' + timestamp,'rb+') as exe_old:
 
         exe_new_byte = exe_new.read(1)
         exe_old_byte = exe_old.read(1)
@@ -132,12 +135,14 @@ for item in os.listdir(tdm_dir + '/x64'):
         if not os.path.exists(item):
             shutil.copy2(tdm_item, item)
 
-# Create Mods folder if it doesn't exist.
+# Create Mods and ShaderFixes folders if they somehow don't exist.
 if not os.path.isdir('Mods'):
     os.mkdir('Mods')
 
+if not os.path.isdir('ShaderFixes'):
+    os.mkdir('ShaderFixes')
+
 # Set up shader filenames.
-github_url = 'https://raw.githubusercontent.com/mpm11011/ac7-ultrawide/master/'
 hud_filename = '9958a636cbef5557-ps_replace.txt'
 map_filename = 'e6f41464a78a35c4-ps_replace.txt'
 char_filename = 'f355a6eae7adfe8e-ps_replace.txt'
@@ -149,90 +154,110 @@ mp_map_filename = 'ec51646d13b1fd16-ps_replace.txt'
 subtitles_filename = 'da86a094e768f000-vs_replace.txt'
 subtitles_hud_checker = 'hudtextfix.ini'
 
-# Download shaders.
-print('Downloading shader files...')
-urllib.request.urlretrieve(github_url + 'ShaderFixes/' + hud_filename, 'ShaderFixes/' + hud_filename)
-urllib.request.urlretrieve(github_url + 'ShaderFixes/' + map_filename, 'ShaderFixes/' + map_filename)
-urllib.request.urlretrieve(github_url + 'ShaderFixes/' + char_filename, 'ShaderFixes/' + char_filename)
-urllib.request.urlretrieve(github_url + 'ShaderFixes/' + map_m7_filename, 'ShaderFixes/' + map_m7_filename)
-urllib.request.urlretrieve(github_url + 'ShaderFixes/' + char_m7_filename, 'ShaderFixes/' + char_m7_filename)
-urllib.request.urlretrieve(github_url + 'ShaderFixes/' + mp_hud_filename, 'ShaderFixes/' + mp_hud_filename)
-urllib.request.urlretrieve(github_url + 'ShaderFixes/' + mp_pause_filename, 'ShaderFixes/' + mp_pause_filename)
-urllib.request.urlretrieve(github_url + 'ShaderFixes/' + mp_map_filename, 'ShaderFixes/' + mp_map_filename)
-urllib.request.urlretrieve(github_url + 'ShaderFixes/' + subtitles_filename, 'ShaderFixes/' + subtitles_filename)
-urllib.request.urlretrieve(github_url + 'Mods/' + subtitles_hud_checker, 'Mods/' + subtitles_hud_checker)
+# Find and modify shaders.
+print('Modifying shader files...')
 
-# Modify shader fix for resolution width.
-print('Modifying shader files for resolution...')
 delta_x = (res_x - 1920) / 3840 # divide by 1920, then divide by 2.
 delta_x = round(delta_x, 4)
 
-with open('ShaderFixes/' + hud_filename,'r+') as hud_file:
-    
-    hud_file.seek(769) # number of bytes to line needing change
-    hud_file.write('  r1.x -= ' + str(delta_x) + ';')
-
-    hud_file.close()
-
-with open('ShaderFixes/' + map_filename,'r+') as map_file:
-    
-    map_file.seek(1035) # number of bytes to line needing change
-    map_file.write('  r0.x -= ' + str(delta_x) + ';')
-
-    map_file.close()
-
-with open('ShaderFixes/' + char_filename,'r+') as char_file:
-    
-    char_file.seek(1035) # number of bytes to line needing change
-    char_file.write('  r0.x -= ' + str(delta_x) + ';')
-
-    char_file.close()
-
-with open('ShaderFixes/' + map_m7_filename,'r+') as map_m7_file:
-    
-    map_m7_file.seek(1038) # number of bytes to line needing change
-    map_m7_file.write('  r1.x -= ' + str(delta_x) + ';')
-
-    map_m7_file.close()
-
-with open('ShaderFixes/' + char_m7_filename,'r+') as char_m7_file:
-    
-    char_m7_file.seek(1038) # number of bytes to line needing change
-    char_m7_file.write('  r1.x -= ' + str(delta_x) + ';')
-
-    char_m7_file.close()
-
-with open('ShaderFixes/' + mp_hud_filename,'r+') as mp_hud_file:
-    
-    mp_hud_file.seek(769) # number of bytes to line needing change
-    mp_hud_file.write('  r1.x -= ' + str(delta_x) + ';')
-
-    mp_hud_file.close()
-
-with open('ShaderFixes/' + mp_pause_filename,'r+') as mp_pause_file:
-    
-    mp_pause_file.seek(1108) # number of bytes to line needing change
-    mp_pause_file.write('  r0.x -= ' + str(delta_x) + ';')
-
-    mp_pause_file.close()
-
-with open('ShaderFixes/' + mp_map_filename,'r+') as mp_map_file:
-    
-    mp_map_file.seek(1108) # number of bytes to line needing change
-    mp_map_file.write('  r0.x -= ' + str(delta_x) + ';')
-
-    mp_map_file.close()
-
-# Modifying subtitles fix for resolution width.
 delta_o = 1 - ((16/9) * (res_h/res_w))
 delta_o = round(delta_o, 4)
 
-with open('ShaderFixes/' + subtitles_filename,'r+') as subtitles_file:
-    
-    subtitles_file.seek(1368) # number of bytes to line needing change
-    subtitles_file.write('   o0.x+=' + str(delta_o) + ';')
+if not os.path.exists('ShaderFixes/' + hud_filename):
+    print('Shader fix for HUD not found! Missing ' + hud_filename + '.')
 
-    subtitles_file.close()
+else:
+    with open('ShaderFixes/' + hud_filename,'r+') as hud_file:
+        
+        hud_file.seek(769) # number of bytes to line needing change
+        hud_file.write('  r1.x -= ' + str(delta_x) + ';')
+        hud_file.close()
+
+if not os.path.exists('ShaderFixes/' + map_filename):
+    print('Shader fix for minimap not found! Missing ' + map_filename + '.')
+
+else:
+    with open('ShaderFixes/' + map_filename,'r+') as map_file:
+        
+        map_file.seek(1035) # number of bytes to line needing change
+        map_file.write('  r0.x -= ' + str(delta_x) + ';')
+        map_file.close()
+
+if not os.path.exists('ShaderFixes/' + char_filename):
+    print('Shader fix for character portraits not found! Missing ' + char_filename + '.')
+
+else:
+    with open('ShaderFixes/' + char_filename,'r+') as char_file:
+        
+        char_file.seek(1035) # number of bytes to line needing change
+        char_file.write('  r0.x -= ' + str(delta_x) + ';')
+        char_file.close()
+
+if not os.path.exists('ShaderFixes/' + map_m7_filename):
+    print('Shader fix for glitchy minimap not found! Missing ' + map_m7_filename + '.')
+
+else:
+    with open('ShaderFixes/' + map_m7_filename,'r+') as map_m7_file:
+        
+        map_m7_file.seek(1038) # number of bytes to line needing change
+        map_m7_file.write('  r1.x -= ' + str(delta_x) + ';')
+        map_m7_file.close()
+
+if not os.path.exists('ShaderFixes/' + char_m7_filename):
+    print('Shader fix for glitchy character portraits not found! Missing ' + char_m7_filename + '.')
+
+else:
+    with open('ShaderFixes/' + char_m7_filename,'r+') as char_m7_file:
+        
+        char_m7_file.seek(1038) # number of bytes to line needing change
+        char_m7_file.write('  r1.x -= ' + str(delta_x) + ';')
+        char_m7_file.close()
+
+
+if not os.path.exists('ShaderFixes/' + mp_hud_filename):
+    print('Shader fix for multiplayer HUD not found! Missing ' + mp_hud_filename + '.')
+
+else:
+    with open('ShaderFixes/' + mp_hud_filename,'r+') as mp_hud_file:
+        
+        mp_hud_file.seek(769) # number of bytes to line needing change
+        mp_hud_file.write('  r1.x -= ' + str(delta_x) + ';')
+        mp_hud_file.close()
+
+
+if not os.path.exists('ShaderFixes/' + mp_pause_filename):
+    print('Shader fix for multiplayer pause menu not found! Missing ' + mp_pause_filename + '.')
+
+else:
+    with open('ShaderFixes/' + mp_pause_filename,'r+') as mp_pause_file:
+        
+        mp_pause_file.seek(1108) # number of bytes to line needing change
+        mp_pause_file.write('  r0.x -= ' + str(delta_x) + ';')
+        mp_pause_file.close()
+
+if not os.path.exists('ShaderFixes/' + mp_map_filename):
+    print('Shader fix for multiplayer minimap not found! Missing ' + mp_map_filename + '.')
+
+else:
+    with open('ShaderFixes/' + mp_map_filename,'r+') as mp_map_file:
+        
+        mp_map_file.seek(1108) # number of bytes to line needing change
+        mp_map_file.write('  r0.x -= ' + str(delta_x) + ';')
+        mp_map_file.close()
+
+
+if not os.path.exists('ShaderFixes/' + subtitles_filename):
+    print('Shader fix for subtitles not found! Missing ' + subtitles_filename + '.')
+
+else:
+    with open('ShaderFixes/' + subtitles_filename,'r+') as subtitles_file:
+        
+        subtitles_file.seek(1368) # number of bytes to line needing change
+        subtitles_file.write('   o0.x+=' + str(delta_o) + ';')
+        subtitles_file.close()
+
+if not os.path.exists('Mods/' + subtitles_hud_checker):
+    print('Fix for subtitles/HUD interaction not found! Missing ' + subtitles_hud_checker + '.')
 
 # Disable shader hunting and enable Mods folder in config file.
 print('Modifying d3dx.ini...')

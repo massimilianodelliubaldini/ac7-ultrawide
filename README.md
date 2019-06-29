@@ -16,12 +16,13 @@ Prerequisites:
 Installation: 
 
 1. Download a zip file of 3Dmigoto and save it to \<Steam Installation Location\>\SteamApps\common\ACE COMBAT 7.
-2. Save magic.py to \<Steam Installation Location\>\SteamApps\common\ACE COMBAT 7.
+2. Clone this repository to, or download a zip and unpack it in, \<Steam Installation Location\>\SteamApps\common\ACE COMBAT 7.
 3. Double magic.py click to run.
 
 TODO:
 
 1. Continue using most-up-to-date shader fixes.
-2. AC7 was patched to v1.02 - deal with any problems that arise from this.
+2. Make install script more robust with user feedback.
+3. Make installation less complex.
 
 
