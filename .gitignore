@@ -2,7 +2,7 @@
 *.hlsl
 *.dll
 *.exe
-*.exe_orig
+*.exe_*
 *.bat
 *.jpg
 

@@ -1,4 +1,4 @@
-import sys, os, shutil, binascii, urllib.request, zipfile, ctypes, math, glob
+import sys, os, shutil, binascii, zipfile, ctypes, math, glob
 from datetime import datetime
 
 # Must be in game root folder.
@@ -50,7 +50,7 @@ else:
 print('Backing up the game exe...')
 timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
 
-if not os.path.isfile('Ace7Game.exe_orig'):
+if not os.path.isfile('Ace7Game.exe_' + timestamp):
     shutil.copy2('Ace7Game.exe','Ace7Game.exe_' + timestamp)
 
 # Edit the game exe.
@@ -97,8 +97,10 @@ with open('Ace7Game.exe','rb+') as exe_new:
 
         exe_old.close()
     exe_new.close()
-    
-if bytes_changed > 4:
+
+if bytes_changed == 0:
+    print('WARNING: No bytes were changed. Was the game already patched? Recommend restoring exe from backup and rerunning this script...')
+elif bytes_changed > 4:
     print('WARNING: More bytes were changed than expected! Recommend restoring exe from backup and performing those changes manually...')
 elif bytes_changed < 4:
     print('WARNING: Fewer bytes were changed than expected! Recommend restoring exe from backup and performing those changes manually...')
