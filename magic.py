@@ -38,6 +38,9 @@ elif res_x in [3840, 3456]: # This value is for dual 16:9, 16:10 monitors.
     
 elif res_x in [5760, 5184]: # This value is for triple 16:9, 16:10 monitors.
     fov_hex = '70 7B 8B 3C D8 F5'
+
+elif res_x in [6400]: # This value is for one 2560x1080 flanked by two 1920x1080 monitors.
+    fov_hex = 'BA 65 90 3C D8 F5'
     
 elif res_x in [1920, 1728]: # This value is for single 16:9, 16:10 monitors.
     fov_hex = '35 FA 0E 3C D8 F5'
