@@ -10,44 +10,43 @@ if not os.path.isfile('Ace7Game.exe'):
 u32 = ctypes.windll.user32
 u32.SetProcessDPIAware()
 
-[res_w, res_h] = [u32.GetSystemMetrics(0), u32.GetSystemMetrics(1)]
-res_y = 1080
-res_x = res_w * (res_y / res_h)
+[your_total_width, your_total_height] = [u32.GetSystemMetrics(0), u32.GetSystemMetrics(1)]
+your_aspect_ratio = your_total_width / your_total_height
+
+# Game calculates positions as if your monitor was always 1080p. These values are useful for those calculations.
+standard_monitor_height = 1080
+standardized_monitor_width = your_total_width * (standard_monitor_height / your_total_height)
 
 # Get confirmation from user.
-print('Your screen size appears to be ' + str(res_w) + 'x' + str(res_h) + '.')
+print('Your screen size appears to be ' + str(your_total_width) + 'x' + str(your_total_height) + '.')
 prompt = ''
 while prompt.lower() != 'y':
     prompt = input('Is that correct? Y to continue, N to cancel:')
 
     if prompt.lower() == 'n':
-        print('Canceled.')
+        wait = input('Canceled. Press any key to close.')
         sys.exit(0)
 
-# Determine FOV hex value.
-# First 4 bytes actually determine FOV, last 2 bytes is explained below.
+# Determining FOV hex value.
+# Math below is based on FOV equations found on Wikipedia. Aspect Ratio = tan(H/2) / tan(V/2)
+# where H and V are the horizontal and vertical field of view angles respectively. 
+# Horizontal FOV on a standard 16:9 monitor is normally 90 degrees.
+# That gives us a value for V (~58.7 deg), which we will keep constant no matter the aspect ratio.
+# We then solve for H given your new aspect ratio.
 print('Determining FOV hex value...')
-if res_x in [2560, 2304]: # This value is for 2560x1080, 2560x1200 monitors.
-    fov_hex = 'AA 05 33 3C D8 F5'
-    
-elif res_x in [2580, 2322]: # This value is for 3440x1440, 3440x1600 monitors.
-    fov_hex = 'ED D1 33 3C D8 F5'
-    
-elif res_x in [3840, 3456]: # This value is for dual 16:9, 16:10 monitors.
-    fov_hex = 'FC CF 65 3C D8 F5'
-    
-elif res_x in [5760, 5184]: # This value is for triple 16:9, 16:10 monitors.
-    fov_hex = '70 7B 8B 3C D8 F5'
+horizontal_fov_radians = 2 * math.atan(your_aspect_ratio * math.tan(math.atan(9/16))) # Shortcutting a lot of math here.
+horizontal_fov_degrees = math.degrees(horizontal_fov_radians)
+print('Horizontal FOV: ' + str(round(horizontal_fov_degrees, 1)) + ' degrees.')
 
-elif res_x in [6400]: # This value is for one 2560x1080 flanked by two 1920x1080 monitors.
-    fov_hex = 'BA 65 90 3C D8 F5'
-    
-elif res_x in [1920, 1728]: # This value is for single 16:9, 16:10 monitors.
-    fov_hex = '35 FA 0E 3C D8 F5'
-    
-else:
-    print('Unknown resolution or aspect ratio. Quitting.')
-    sys.exit(0)
+# This is a linear approximation to turn degrees into a hex value - found experimentally, not mathematically.
+# Point 1: x1 = 90, y1 = 981577 (in hex, 0E FA 35) (standard 16:9 monitor, stock value in game exe).
+# Point 2: x2 = 106.7, y2 = 3145728 (in hex, 30 00 00) (3440x1440 monitor, and almost pixel-perfect matching Point 1).
+decimal_value = round((129591 * horizontal_fov_degrees) - 10681633)
+
+hex_value = format(decimal_value, '06X') # Pad for leading zeros.
+hex_string = ' '.join(map(str.__add__, hex_value[-2::-2], hex_value[-1::-2])) # Reverse the string by byte and separate with spaces.
+hex_string = hex_string + ' 3C D8 F5' # First 3 bytes actually determine FOV, last 3 bytes are explained below.
+print('New FOV hex value: ' + str(hex_string))
 
 # Back up the game exe.
 print('Backing up the game exe...')
@@ -66,10 +65,10 @@ with open('Ace7Game.exe','rb+') as exe:
 # The value '41 2C 01 4C 89 CB 0F 29' is only found once in the EXE.
 exe_data = exe_data.replace(bytes.fromhex('41 2C 01 4C 89 CB 0F 29'), bytes.fromhex('41 2C 00 4C 89 CB 0F 29')) # Removes black bars.
 
-# '35 FA 0E 3C' is the default FOV value we want to replace, but it is found 6 times in the EXE, and we only want to replace it once. 
-# How do we know which one to replace? 'D8 F5' happens to follow that value at the FOV address, and it doesn't follow any other addresses with the same value.
+# '35 FA 0E' is the default FOV value we want to replace, but it is found several times in the EXE, and we only want to replace it once. 
+# How do we know which one to replace? '3C D8 F5' happens to follow that value at the FOV address, and it doesn't follow any other addresses with the same value.
 # So when we search for '35 FA 0E 3C D8 F5' we only find it once, which is exactly what we need.
-exe_data = exe_data.replace(bytes.fromhex('35 FA 0E 3C D8 F5'), bytes.fromhex(fov_hex)) # Fixes field of view.
+exe_data = exe_data.replace(bytes.fromhex('35 FA 0E 3C D8 F5'), bytes.fromhex(hex_string)) # Fixes field of view.
 
 with open('Ace7Game.exe','wb') as exe:
     
@@ -162,11 +161,11 @@ subtitles_hud_checker = 'hudtextfix.ini'
 # Find and modify shaders.
 print('Modifying shader files...')
 
-delta_x = (res_x - 1920) / 3840 # divide by 1920, then divide by 2.
-delta_x = round(delta_x, 4)
+hud_shift_amount = (standardized_monitor_width - 1920) / 3840 # divide by 1920, then divide by 2.
+hud_shift_amount = round(hud_shift_amount, 4)
 
-delta_o = 1 - ((16/9) * (res_h/res_w))
-delta_o = round(delta_o, 4)
+subtitle_shift_amount = 1 - ((16/9) / your_aspect_ratio)
+subtitle_shift_amount = round(subtitle_shift_amount, 4)
 
 if not os.path.exists('ShaderFixes/' + hud_filename):
     print('Shader fix for HUD not found! Missing ' + hud_filename + '.')
@@ -175,7 +174,7 @@ else:
     with open('ShaderFixes/' + hud_filename,'r+') as hud_file:
         
         hud_file.seek(769) # number of bytes to line needing change
-        hud_file.write('  r1.x -= ' + str(delta_x) + ';')
+        hud_file.write('  r1.x -= ' + str(hud_shift_amount) + ';')
         hud_file.close()
 
 if not os.path.exists('ShaderFixes/' + map_filename):
@@ -185,7 +184,7 @@ else:
     with open('ShaderFixes/' + map_filename,'r+') as map_file:
         
         map_file.seek(1035) # number of bytes to line needing change
-        map_file.write('  r0.x -= ' + str(delta_x) + ';')
+        map_file.write('  r0.x -= ' + str(hud_shift_amount) + ';')
         map_file.close()
 
 if not os.path.exists('ShaderFixes/' + char_filename):
@@ -195,7 +194,7 @@ else:
     with open('ShaderFixes/' + char_filename,'r+') as char_file:
         
         char_file.seek(1035) # number of bytes to line needing change
-        char_file.write('  r0.x -= ' + str(delta_x) + ';')
+        char_file.write('  r0.x -= ' + str(hud_shift_amount) + ';')
         char_file.close()
 
 if not os.path.exists('ShaderFixes/' + map_m7_filename):
@@ -205,7 +204,7 @@ else:
     with open('ShaderFixes/' + map_m7_filename,'r+') as map_m7_file:
         
         map_m7_file.seek(1038) # number of bytes to line needing change
-        map_m7_file.write('  r1.x -= ' + str(delta_x) + ';')
+        map_m7_file.write('  r1.x -= ' + str(hud_shift_amount) + ';')
         map_m7_file.close()
 
 if not os.path.exists('ShaderFixes/' + char_m7_filename):
@@ -215,7 +214,7 @@ else:
     with open('ShaderFixes/' + char_m7_filename,'r+') as char_m7_file:
         
         char_m7_file.seek(1038) # number of bytes to line needing change
-        char_m7_file.write('  r1.x -= ' + str(delta_x) + ';')
+        char_m7_file.write('  r1.x -= ' + str(hud_shift_amount) + ';')
         char_m7_file.close()
 
 
@@ -226,7 +225,7 @@ else:
     with open('ShaderFixes/' + mp_hud_filename,'r+') as mp_hud_file:
         
         mp_hud_file.seek(769) # number of bytes to line needing change
-        mp_hud_file.write('  r1.x -= ' + str(delta_x) + ';')
+        mp_hud_file.write('  r1.x -= ' + str(hud_shift_amount) + ';')
         mp_hud_file.close()
 
 
@@ -237,7 +236,7 @@ else:
     with open('ShaderFixes/' + mp_pause_filename,'r+') as mp_pause_file:
         
         mp_pause_file.seek(1108) # number of bytes to line needing change
-        mp_pause_file.write('  r0.x -= ' + str(delta_x) + ';')
+        mp_pause_file.write('  r0.x -= ' + str(hud_shift_amount) + ';')
         mp_pause_file.close()
 
 if not os.path.exists('ShaderFixes/' + mp_map_filename):
@@ -247,7 +246,7 @@ else:
     with open('ShaderFixes/' + mp_map_filename,'r+') as mp_map_file:
         
         mp_map_file.seek(1108) # number of bytes to line needing change
-        mp_map_file.write('  r0.x -= ' + str(delta_x) + ';')
+        mp_map_file.write('  r0.x -= ' + str(hud_shift_amount) + ';')
         mp_map_file.close()
 
 
@@ -258,7 +257,7 @@ else:
     with open('ShaderFixes/' + subtitles_filename,'r+') as subtitles_file:
         
         subtitles_file.seek(1368) # number of bytes to line needing change
-        subtitles_file.write('   o0.x+=' + str(delta_o) + ';')
+        subtitles_file.write('   o0.x+=' + str(subtitle_shift_amount) + ';')
         subtitles_file.close()
 
 if not os.path.exists('Mods/' + subtitles_hud_checker):
