@@ -115,7 +115,7 @@ tdm_regex = '3Dmigoto-*.zip'
 tdm_list = glob.glob(tdm_regex)
 
 if not tdm_list:
-    print('3Dmigoto zip file not found. Quitting.')
+    wait = input('3Dmigoto zip file not found. Press any key to close.')
     sys.exit(0)
 
 tdm_zip = tdm_list[0]
@@ -127,16 +127,25 @@ zip_ref = zipfile.ZipFile(tdm_zip, 'r')
 zip_ref.extractall(tdm_dir)
 zip_ref.close()
 
+# Check for correct folder structure.
+try:
+    item_list = os.listdir(tdm_dir + '/x64')
+except WinError:
+    wait = input('Could not find ' + tdm_dir + '/x64 folder. Press any key to close.')
+    sys.exit(0)
+
 # Copy files from x64 folder to game root folder.
 print('Installing 3Dmigoto...')
-for item in os.listdir(tdm_dir + '/x64'):
+for item in item_list:
     
     tdm_item = tdm_dir + '/x64/' + item
     try:
         if not os.path.exists(item):
+            print('Copying folder ' + item)
             shutil.copytree(tdm_item, item)
     except:
         if not os.path.exists(item):
+            print('Copying file ' + item)
             shutil.copy2(tdm_item, item)
 
 # Create Mods and ShaderFixes folders if they somehow don't exist.
@@ -168,7 +177,7 @@ subtitle_shift_amount = 1 - ((16/9) / your_aspect_ratio)
 subtitle_shift_amount = round(subtitle_shift_amount, 4)
 
 if not os.path.exists('ShaderFixes/' + hud_filename):
-    print('Shader fix for HUD not found! Missing ' + hud_filename + '.')
+    print('WARNING: Shader fix for HUD not found! Missing ' + hud_filename + '.')
 
 else:
     with open('ShaderFixes/' + hud_filename,'r+') as hud_file:
@@ -178,7 +187,7 @@ else:
         hud_file.close()
 
 if not os.path.exists('ShaderFixes/' + map_filename):
-    print('Shader fix for minimap not found! Missing ' + map_filename + '.')
+    print('WARNING: Shader fix for minimap not found! Missing ' + map_filename + '.')
 
 else:
     with open('ShaderFixes/' + map_filename,'r+') as map_file:
@@ -188,7 +197,7 @@ else:
         map_file.close()
 
 if not os.path.exists('ShaderFixes/' + char_filename):
-    print('Shader fix for character portraits not found! Missing ' + char_filename + '.')
+    print('WARNING: Shader fix for character portraits not found! Missing ' + char_filename + '.')
 
 else:
     with open('ShaderFixes/' + char_filename,'r+') as char_file:
@@ -198,7 +207,7 @@ else:
         char_file.close()
 
 if not os.path.exists('ShaderFixes/' + map_m7_filename):
-    print('Shader fix for glitchy minimap not found! Missing ' + map_m7_filename + '.')
+    print('WARNING: Shader fix for glitchy minimap not found! Missing ' + map_m7_filename + '.')
 
 else:
     with open('ShaderFixes/' + map_m7_filename,'r+') as map_m7_file:
@@ -208,7 +217,7 @@ else:
         map_m7_file.close()
 
 if not os.path.exists('ShaderFixes/' + char_m7_filename):
-    print('Shader fix for glitchy character portraits not found! Missing ' + char_m7_filename + '.')
+    print('WARNING: Shader fix for glitchy character portraits not found! Missing ' + char_m7_filename + '.')
 
 else:
     with open('ShaderFixes/' + char_m7_filename,'r+') as char_m7_file:
@@ -219,7 +228,7 @@ else:
 
 
 if not os.path.exists('ShaderFixes/' + mp_hud_filename):
-    print('Shader fix for multiplayer HUD not found! Missing ' + mp_hud_filename + '.')
+    print('WARNING: Shader fix for multiplayer HUD not found! Missing ' + mp_hud_filename + '.')
 
 else:
     with open('ShaderFixes/' + mp_hud_filename,'r+') as mp_hud_file:
@@ -230,7 +239,7 @@ else:
 
 
 if not os.path.exists('ShaderFixes/' + mp_pause_filename):
-    print('Shader fix for multiplayer pause menu not found! Missing ' + mp_pause_filename + '.')
+    print('WARNING: Shader fix for multiplayer pause menu not found! Missing ' + mp_pause_filename + '.')
 
 else:
     with open('ShaderFixes/' + mp_pause_filename,'r+') as mp_pause_file:
@@ -240,7 +249,7 @@ else:
         mp_pause_file.close()
 
 if not os.path.exists('ShaderFixes/' + mp_map_filename):
-    print('Shader fix for multiplayer minimap not found! Missing ' + mp_map_filename + '.')
+    print('WARNING: Shader fix for multiplayer minimap not found! Missing ' + mp_map_filename + '.')
 
 else:
     with open('ShaderFixes/' + mp_map_filename,'r+') as mp_map_file:
@@ -251,7 +260,7 @@ else:
 
 
 if not os.path.exists('ShaderFixes/' + subtitles_filename):
-    print('Shader fix for subtitles not found! Missing ' + subtitles_filename + '.')
+    print('WARNING: Shader fix for subtitles not found! Missing ' + subtitles_filename + '.')
 
 else:
     with open('ShaderFixes/' + subtitles_filename,'r+') as subtitles_file:
@@ -261,7 +270,7 @@ else:
         subtitles_file.close()
 
 if not os.path.exists('Mods/' + subtitles_hud_checker):
-    print('Fix for subtitles/HUD interaction not found! Missing ' + subtitles_hud_checker + '.')
+    print('WARNING: Fix for subtitles/HUD interaction not found! Missing ' + subtitles_hud_checker + '.')
 
 # Disable shader hunting and enable Mods folder in config file.
 print('Modifying d3dx.ini...')
@@ -278,4 +287,4 @@ with open('d3dx.ini','w') as ini:
     ini.write(ini_data);
     ini.close()
 
-wait = input('Script complete. Press any key to close.')
+wait = input('Script completed successfully. Press any key to close.')
