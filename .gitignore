@@ -18,3 +18,5 @@
 /d3d11_log.txt
 /nvapi_log.txt
 /d3dx.ini
+
+__pycache__

@@ -10,6 +10,12 @@ What it does:
 5. Unpacks 3Dmigoto into the game directory.
 6. Modifies the shader files for the correct position and resolution.
 
+WARNING: 
+
+Due to the fact that this mod makes direct modification to the game executable, 
+the game's new anticheat system may flag you and get you permanently banned from online play. 
+This developer holds no responsibility if this happens to you! 
+
 Prerequisites:
 
 1. [Python 3.5 or newer](https://www.python.org/downloads/) (Make sure you allow it to modify your Windows PATH environment variable upon installation)
@@ -21,10 +27,17 @@ Installation:
 2. Clone this repository to, or download a zip and unpack it in, \<Steam Installation Location\>\SteamApps\common\ACE COMBAT 7.
 3. Double magic.py click to run.
 
+Uninstallation:
+
+1. Delete d3d11.dll from your game directory.
+2. Delete Ace7Game.exe from your game directory.
+3. "Verify integrity of game files" in Steam. This will re-download the most up-to-date executable.
+
 TODO:
 
 1. Continue using most-up-to-date shader fixes.
 2. Make install script more robust with user feedback.
 3. Make installation less complex.
+4. Improve code reuse.
 
 

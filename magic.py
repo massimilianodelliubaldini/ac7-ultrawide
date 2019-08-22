@@ -6,6 +6,18 @@ if not os.path.isfile('Ace7Game.exe'):
     wait = input('Ace7Game.exe not found in this folder. Press any key to close...')
     sys.exit(0)
 
+# Add warning about the risk of getting flagged by anticheat.
+print('WARNING: This mod may be flagged as a cheating tool by the new Ace Combat 7 anti-cheat system going live in August 2019.')
+print('It is highly recommended NOT playing online with this mod installed until further investigation.')
+print('This developer holds no responsibility if this mod results in an online ban.')
+prompt = ''
+while prompt.lower() != 'y':
+    prompt = input('Are you sure you wish to continue? Y to continue, N to cancel:')
+
+    if prompt.lower() == 'n':
+        wait = input('Canceled. Press any key to close.')
+        sys.exit(0)
+
 # Get resolution from OS.
 u32 = ctypes.windll.user32
 u32.SetProcessDPIAware()
