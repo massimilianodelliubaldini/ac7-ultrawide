@@ -45,7 +45,7 @@ while prompt.lower() != 'y':
 # That gives us a value for V (~58.7 deg), which we will keep constant no matter the aspect ratio.
 # We then solve for H given your new aspect ratio.
 print('Determining FOV hex value...')
-horizontal_fov_radians = 2 * math.atan(your_aspect_ratio * math.tan(math.atan(9/16))) # Shortcutting a lot of math here.
+horizontal_fov_radians = 2 * math.atan(your_aspect_ratio * (9/16)) # Shortcutting a lot of math here.
 
 # Word of warning: you can set this variable to a value of your choosing, e.g. 120,
 # but do not play online with anything other than the automatically determined FOV. 
@@ -54,7 +54,7 @@ horizontal_fov_degrees = math.degrees(horizontal_fov_radians)
 print('Horizontal FOV: ' + str(round(horizontal_fov_degrees, 1)) + ' degrees.')
 
 # This is a linear approximation to turn degrees into a hex value - found experimentally, not mathematically.
-# Point 1: x1 = 90, y1 = 981577 (in hex, 0E FA 35) (standard 16:9 monitor, stock value in game exe).
+# Point 1: x1 = 90, y1 = 981557 (in hex, 0E FA 35) (standard 16:9 monitor, stock value in game exe).
 # Point 2: x2 = 106.7, y2 = 3145728 (in hex, 30 00 00) (3440x1440 monitor, and almost pixel-perfect matching Point 1).
 decimal_value = round((129591 * horizontal_fov_degrees) - 10681633)
 
