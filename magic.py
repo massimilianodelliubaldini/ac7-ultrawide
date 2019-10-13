@@ -8,7 +8,6 @@ if not os.path.isfile('Ace7Game.exe'):
 
 # Add warning about the risk of getting flagged by anticheat.
 print('WARNING: This mod may be flagged as a cheating tool by the new Ace Combat 7 anti-cheat system going live in August 2019.')
-print('It is highly recommended NOT playing online with this mod installed until further investigation.')
 print('This developer holds no responsibility if this mod results in an online ban.')
 prompt = ''
 while prompt.lower() != 'y':
@@ -47,7 +46,11 @@ while prompt.lower() != 'y':
 # We then solve for H given your new aspect ratio.
 print('Determining FOV hex value...')
 horizontal_fov_radians = 2 * math.atan(your_aspect_ratio * math.tan(math.atan(9/16))) # Shortcutting a lot of math here.
-horizontal_fov_degrees = math.degrees(horizontal_fov_radians)
+
+# Word of warning: you can set this variable to a value of your choosing, e.g. 120,
+# but do not play online with anything other than the automatically determined FOV. 
+horizontal_fov_degrees = math.degrees(horizontal_fov_radians) 
+
 print('Horizontal FOV: ' + str(round(horizontal_fov_degrees, 1)) + ' degrees.')
 
 # This is a linear approximation to turn degrees into a hex value - found experimentally, not mathematically.
@@ -168,108 +171,17 @@ if not os.path.isdir('ShaderFixes'):
     os.mkdir('ShaderFixes')
 
 # Set up shader filenames.
-hud_filename = '9958a636cbef5557-ps_replace.txt'
-map_filename = 'e6f41464a78a35c4-ps_replace.txt'
-char_filename = 'f355a6eae7adfe8e-ps_replace.txt'
-map_m7_filename = '27f3e07e177ddf67-ps_replace.txt'
-char_m7_filename = 'f904af6042b80b52-ps_replace.txt'
-mp_hud_filename = '6dcdbf6042a8a27a-ps_replace.txt'
-mp_pause_filename = 'c75a35eef5821976-ps_replace.txt'
-mp_map_filename = 'ec51646d13b1fd16-ps_replace.txt'
 subtitles_filename = 'da86a094e768f000-vs_replace.txt'
-subtitles_hud_checker = 'hudtextfix.ini'
+hudfix_filename = 'hudtextfix.ini'
 
-# Find and modify shaders.
-print('Modifying shader files...')
+# Find and modify HUD location.
+print('Modifying HUD and subtitles location...')
 
 hud_shift_amount = (standardized_monitor_width - 1920) / 3840 # divide by 1920, then divide by 2.
-hud_shift_amount = round(hud_shift_amount, 4)
+hud_shift_amount = round(hud_shift_amount, 4) * -1
 
 subtitle_shift_amount = 1 - ((16/9) / your_aspect_ratio)
-subtitle_shift_amount = round(subtitle_shift_amount, 4)
-
-if not os.path.exists('ShaderFixes/' + hud_filename):
-    print('WARNING: Shader fix for HUD not found! Missing ' + hud_filename + '.')
-
-else:
-    with open('ShaderFixes/' + hud_filename,'r+') as hud_file:
-        
-        hud_file.seek(769) # number of bytes to line needing change
-        hud_file.write('  r1.x -= ' + str(hud_shift_amount) + ';')
-        hud_file.close()
-
-if not os.path.exists('ShaderFixes/' + map_filename):
-    print('WARNING: Shader fix for minimap not found! Missing ' + map_filename + '.')
-
-else:
-    with open('ShaderFixes/' + map_filename,'r+') as map_file:
-        
-        map_file.seek(1035) # number of bytes to line needing change
-        map_file.write('  r0.x -= ' + str(hud_shift_amount) + ';')
-        map_file.close()
-
-if not os.path.exists('ShaderFixes/' + char_filename):
-    print('WARNING: Shader fix for character portraits not found! Missing ' + char_filename + '.')
-
-else:
-    with open('ShaderFixes/' + char_filename,'r+') as char_file:
-        
-        char_file.seek(1035) # number of bytes to line needing change
-        char_file.write('  r0.x -= ' + str(hud_shift_amount) + ';')
-        char_file.close()
-
-if not os.path.exists('ShaderFixes/' + map_m7_filename):
-    print('WARNING: Shader fix for glitchy minimap not found! Missing ' + map_m7_filename + '.')
-
-else:
-    with open('ShaderFixes/' + map_m7_filename,'r+') as map_m7_file:
-        
-        map_m7_file.seek(1038) # number of bytes to line needing change
-        map_m7_file.write('  r1.x -= ' + str(hud_shift_amount) + ';')
-        map_m7_file.close()
-
-if not os.path.exists('ShaderFixes/' + char_m7_filename):
-    print('WARNING: Shader fix for glitchy character portraits not found! Missing ' + char_m7_filename + '.')
-
-else:
-    with open('ShaderFixes/' + char_m7_filename,'r+') as char_m7_file:
-        
-        char_m7_file.seek(1038) # number of bytes to line needing change
-        char_m7_file.write('  r1.x -= ' + str(hud_shift_amount) + ';')
-        char_m7_file.close()
-
-
-if not os.path.exists('ShaderFixes/' + mp_hud_filename):
-    print('WARNING: Shader fix for multiplayer HUD not found! Missing ' + mp_hud_filename + '.')
-
-else:
-    with open('ShaderFixes/' + mp_hud_filename,'r+') as mp_hud_file:
-        
-        mp_hud_file.seek(769) # number of bytes to line needing change
-        mp_hud_file.write('  r1.x -= ' + str(hud_shift_amount) + ';')
-        mp_hud_file.close()
-
-
-if not os.path.exists('ShaderFixes/' + mp_pause_filename):
-    print('WARNING: Shader fix for multiplayer pause menu not found! Missing ' + mp_pause_filename + '.')
-
-else:
-    with open('ShaderFixes/' + mp_pause_filename,'r+') as mp_pause_file:
-        
-        mp_pause_file.seek(1108) # number of bytes to line needing change
-        mp_pause_file.write('  r0.x -= ' + str(hud_shift_amount) + ';')
-        mp_pause_file.close()
-
-if not os.path.exists('ShaderFixes/' + mp_map_filename):
-    print('WARNING: Shader fix for multiplayer minimap not found! Missing ' + mp_map_filename + '.')
-
-else:
-    with open('ShaderFixes/' + mp_map_filename,'r+') as mp_map_file:
-        
-        mp_map_file.seek(1108) # number of bytes to line needing change
-        mp_map_file.write('  r0.x -= ' + str(hud_shift_amount) + ';')
-        mp_map_file.close()
-
+subtitle_shift_amount = round(subtitle_shift_amount, 4) 
 
 if not os.path.exists('ShaderFixes/' + subtitles_filename):
     print('WARNING: Shader fix for subtitles not found! Missing ' + subtitles_filename + '.')
@@ -277,26 +189,44 @@ if not os.path.exists('ShaderFixes/' + subtitles_filename):
 else:
     with open('ShaderFixes/' + subtitles_filename,'r+') as subtitles_file:
         
-        subtitles_file.seek(1368) # number of bytes to line needing change
+        subtitles_file.seek(1368) # number of bytes to line needing change - TODO: This really needs to be more robust.
         subtitles_file.write('   o0.x+=' + str(subtitle_shift_amount) + ';')
         subtitles_file.close()
 
-if not os.path.exists('Mods/' + subtitles_hud_checker):
-    print('WARNING: Fix for subtitles/HUD interaction not found! Missing ' + subtitles_hud_checker + '.')
+if not os.path.exists('Mods/' + hudfix_filename):
+    print('WARNING: Fix for HUD and subtitles not found! Missing ' + hudfix_filename + '.')
+
+else:
+    with open('Mods/' + hudfix_filename, 'r+') as hudfix_ini:
+
+        hudfix_ini_data = hudfix_ini.read()
+        hudfix_ini.close()
+
+    hudfix_ini_data = hudfix_ini_data.replace('l(-0.0000)', 'l(' + str(hud_shift_amount) + ')')
+
+    with open('Mods/' + hudfix_filename, 'w') as hudfix_ini:
+    
+        hudfix_ini.write(hudfix_ini_data);
+        hudfix_ini.close()
 
 # Disable shader hunting and enable Mods folder in config file.
-print('Modifying d3dx.ini...')
-with open('d3dx.ini','r+') as ini:
-    
-    ini_data = ini.read()
-    ini.close()
-    
-ini_data = ini_data.replace(';include_recursive = Mods','include_recursive = Mods')
-ini_data = ini_data.replace('hunting=1','hunting=0')
-    
-with open('d3dx.ini','w') as ini:
-    
-    ini.write(ini_data);
-    ini.close()
+print('Modifying config file...')
+
+if not os.path.exists('d3dx.ini'):
+    print('WARNING: d3dx.ini config file not found!')
+
+else:
+    with open('d3dx.ini', 'r+') as config_ini:
+        
+        config_ini_data = config_ini.read()
+        config_ini.close()
+        
+    config_ini_data = config_ini_data.replace(';include_recursive = Mods','include_recursive = Mods')
+    config_ini_data = config_ini_data.replace('hunting=1','hunting=0')
+        
+    with open('d3dx.ini', 'w') as config_ini:
+        
+        config_ini.write(config_ini_data);
+        config_ini.close()
 
 wait = input('Script completed successfully. Press any key to close.')
