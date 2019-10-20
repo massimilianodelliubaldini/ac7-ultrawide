@@ -3,7 +3,7 @@ from datetime import datetime
 
 # Must be in game root folder.
 if not os.path.isfile('Ace7Game.exe'):
-    wait = input('Ace7Game.exe not found in this folder. Press any key to close...')
+    wait = input('ERROR: Ace7Game.exe not found in this folder. Press any key to close...')
     sys.exit(0)
 
 # Add warning about the risk of getting flagged by anticheat.
@@ -190,7 +190,7 @@ tdm_regex = '3Dmigoto-*.zip'
 tdm_list = glob.glob(tdm_regex)
 
 if not tdm_list:
-    wait = input('3Dmigoto zip file not found. Press any key to close.')
+    wait = input('ERROR: 3Dmigoto zip file not found. Press any key to close.')
     sys.exit(0)
 
 tdm_zip = tdm_list[0]
@@ -206,7 +206,7 @@ zip_ref.close()
 try:
     item_list = os.listdir(tdm_dir + '/x64')
 except OSError:
-    wait = input('Could not find ' + tdm_dir + '/x64 folder. Press any key to close.')
+    wait = input('ERROR: Could not find ' + tdm_dir + '/x64 folder. Press any key to close.')
     sys.exit(0)
 
 # Copy files from x64 folder to game root folder.
