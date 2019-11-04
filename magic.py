@@ -3,7 +3,7 @@ from datetime import datetime
 
 # Must be in game root folder.
 if not os.path.isfile('Ace7Game.exe'):
-    wait = input('Ace7Game.exe not found in this folder. Press any key to close...')
+    wait = input('ERROR: Ace7Game.exe not found in this folder. Press any key to close...')
     sys.exit(0)
 
 # Add warning about the risk of getting flagged by anticheat.
@@ -67,15 +67,47 @@ print('New FOV hex value: ' + str(hex_string))
 print('Backing up the game exe...')
 timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
 
-if not os.path.isfile('Ace7Game.exe_' + timestamp):
-    shutil.copy2('Ace7Game.exe','Ace7Game.exe_' + timestamp)
+attempts = 5
+while attempts >= 0:
+    try:
+        if not os.path.isfile('Ace7Game.exe_' + timestamp):
+            shutil.copy2('Ace7Game.exe','Ace7Game.exe_' + timestamp)
+
+            # If we reach the break, then we hit no exceptions and we can safely leave the while loop.
+            break
+
+    except OSError as e:
+        print('OSError ' + str(e.errno) + '. File may be locked by another process.')
+        if attempts > 0:
+            print('Will wait 5 seconds and try again. Attempts remaining: ' + str(attempts) + '.')
+        else:
+            wait = input('ERROR: Unable to backup game exe. Press any key to close.')
+            sys.exit(0)
+    finally:
+        attempts -= 1
 
 # Edit the game exe.
 print('Modifying the game exe...')
-with open('Ace7Game.exe','rb+') as exe:
 
-    exe_data = exe.read()
-    exe.close()
+attempts = 5
+while attempts >= 0:
+    try:
+        with open('Ace7Game.exe','rb+') as exe:
+
+            exe_data = exe.read()
+
+            # If we reach the break, then we hit no exceptions and we can safely leave the while loop.
+            break
+
+    except OSError as e:
+        print('OSError ' + str(e.errno) + '. File may be locked by another process.')
+        if attempts > 0:
+            print('Will wait 5 seconds and try again. Attempts remaining: ' + str(attempts) + '.')
+        else:
+            wait = input('ERROR: Unable to read game exe. Press any key to close.')
+            sys.exit(0)
+    finally:
+        attempts -= 1
 
 # The value '41 2C 01 4C 89 CB 0F 29' is only found once in the EXE.
 exe_data = exe_data.replace(bytes.fromhex('41 2C 01 4C 89 CB 0F 29'), bytes.fromhex('41 2C 00 4C 89 CB 0F 29')) # Removes black bars.
@@ -85,44 +117,72 @@ exe_data = exe_data.replace(bytes.fromhex('41 2C 01 4C 89 CB 0F 29'), bytes.from
 # So when we search for '35 FA 0E 3C D8 F5' we only find it once, which is exactly what we need.
 exe_data = exe_data.replace(bytes.fromhex('35 FA 0E 3C D8 F5'), bytes.fromhex(hex_string)) # Fixes field of view.
 
-with open('Ace7Game.exe','wb') as exe:
-    
-    exe.write(exe_data);
-    exe.close()
+attempts = 5
+while attempts >= 0:
+    try:
+        with open('Ace7Game.exe','wb') as exe:
+
+            exe.write(exe_data);
+
+            # If we reach the break, then we hit no exceptions and we can safely leave the while loop.
+            break
+
+    except OSError as e:
+        print('OSError ' + str(e.errno) + '. File may be locked by another process.')
+        if attempts > 0:
+            print('Will wait 5 seconds and try again. Attempts remaining: ' + str(attempts) + '.')
+        else:
+            wait = input('ERROR: Unable to rewrite game exe. Press any key to close.')
+            sys.exit(0)
+    finally:
+        attempts -= 1
 
 # Check to make sure nothing broke by comparing number of bytes modified. Should only be 4.
 print('Verifying the game exe...')
 
-bytes_changed = 0
-address = 0
-with open('Ace7Game.exe','rb+') as exe_new:
-    with open('Ace7Game.exe_' + timestamp,'rb+') as exe_old:
+attempts = 5
+while attempts >= 0:
+    try:
+        bytes_changed = 0
+        address = 0
+        with open('Ace7Game.exe','rb+') as exe_new:
+            with open('Ace7Game.exe_' + timestamp,'rb+') as exe_old:
 
-        exe_new_byte = exe_new.read(1)
-        exe_old_byte = exe_old.read(1)
+                exe_new_byte = exe_new.read(1)
+                exe_old_byte = exe_old.read(1)
 
-        while exe_new_byte:
-            if exe_new_byte != exe_old_byte:
-                
-                bytes_changed += 1
-                print('Old byte: ' + str(exe_old_byte) + ', New byte: ' + str(exe_new_byte) + ', at address: ' + str(address))
+                while exe_new_byte:
+                    if exe_new_byte != exe_old_byte:
+                        
+                        bytes_changed += 1
+                        print('Old byte: ' + str(exe_old_byte) + ', New byte: ' + str(exe_new_byte) + ', at address: ' + str(address))
 
-            exe_new_byte = exe_new.read(1)
-            exe_old_byte = exe_old.read(1)
+                    exe_new_byte = exe_new.read(1)
+                    exe_old_byte = exe_old.read(1)
 
-            address += 1
+                    address += 1
 
-        exe_old.close()
-    exe_new.close()
+        if bytes_changed == 0:
+            print('WARNING: No bytes were changed. Was the game already patched? Recommend restoring exe from backup and rerunning this script...')
+        elif bytes_changed > 4:
+            print('WARNING: More bytes were changed than expected! Recommend restoring exe from backup and performing those changes manually...')
+        elif bytes_changed < 4:
+            print('WARNING: Fewer bytes were changed than expected! Recommend restoring exe from backup and performing those changes manually...')
+        else:
+            print('Verification successful.')
 
-if bytes_changed == 0:
-    print('WARNING: No bytes were changed. Was the game already patched? Recommend restoring exe from backup and rerunning this script...')
-elif bytes_changed > 4:
-    print('WARNING: More bytes were changed than expected! Recommend restoring exe from backup and performing those changes manually...')
-elif bytes_changed < 4:
-    print('WARNING: Fewer bytes were changed than expected! Recommend restoring exe from backup and performing those changes manually...')
-else:
-    print('Verification successful.')
+        # If we reach the break, then we hit no exceptions and we can safely leave the while loop.
+        break
+
+    except OSError as e:
+        print('OSError ' + str(e.errno) + '. File may be locked by another process.')
+        if attempts > 0:
+            print('Will wait 5 seconds and try again. Attempts remaining: ' + str(attempts) + '.')
+        else:
+            wait = input('ERROR: Unable to verify game exe. Press any key to close.')
+            sys.exit(0)
+    finally:
+        attempts -= 1
 
 # Check for 3Dmigoto zip file.
 print('Checking for 3Dmigoto zip file...')
@@ -130,7 +190,7 @@ tdm_regex = '3Dmigoto-*.zip'
 tdm_list = glob.glob(tdm_regex)
 
 if not tdm_list:
-    wait = input('3Dmigoto zip file not found. Press any key to close.')
+    wait = input('ERROR: 3Dmigoto zip file not found. Press any key to close.')
     sys.exit(0)
 
 tdm_zip = tdm_list[0]
@@ -145,8 +205,8 @@ zip_ref.close()
 # Check for correct folder structure.
 try:
     item_list = os.listdir(tdm_dir + '/x64')
-except WinError:
-    wait = input('Could not find ' + tdm_dir + '/x64 folder. Press any key to close.')
+except OSError:
+    wait = input('ERROR: Could not find ' + tdm_dir + '/x64 folder. Press any key to close.')
     sys.exit(0)
 
 # Copy files from x64 folder to game root folder.
