@@ -1,4 +1,4 @@
-import sys, os, shutil, binascii, zipfile, ctypes, math, glob
+import sys, os, shutil, binascii, zipfile, ctypes, math, glob, time
 from datetime import datetime
 
 # Must be in game root folder.
@@ -80,6 +80,7 @@ while attempts >= 0:
         print('OSError ' + str(e.errno) + '. File may be locked by another process.')
         if attempts > 0:
             print('Will wait 5 seconds and try again. Attempts remaining: ' + str(attempts) + '.')
+            time.sleep(5)
         else:
             wait = input('ERROR: Unable to backup game exe. Press any key to close.')
             sys.exit(0)
@@ -103,6 +104,7 @@ while attempts >= 0:
         print('OSError ' + str(e.errno) + '. File may be locked by another process.')
         if attempts > 0:
             print('Will wait 5 seconds and try again. Attempts remaining: ' + str(attempts) + '.')
+            time.sleep(5)
         else:
             wait = input('ERROR: Unable to read game exe. Press any key to close.')
             sys.exit(0)
@@ -131,6 +133,7 @@ while attempts >= 0:
         print('OSError ' + str(e.errno) + '. File may be locked by another process.')
         if attempts > 0:
             print('Will wait 5 seconds and try again. Attempts remaining: ' + str(attempts) + '.')
+            time.sleep(5)
         else:
             wait = input('ERROR: Unable to rewrite game exe. Press any key to close.')
             sys.exit(0)
@@ -178,6 +181,7 @@ while attempts >= 0:
         print('OSError ' + str(e.errno) + '. File may be locked by another process.')
         if attempts > 0:
             print('Will wait 5 seconds and try again. Attempts remaining: ' + str(attempts) + '.')
+            time.sleep(5)
         else:
             wait = input('ERROR: Unable to verify game exe. Press any key to close.')
             sys.exit(0)
