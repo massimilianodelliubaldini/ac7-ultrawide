@@ -21,6 +21,8 @@ Prerequisites:
 1. [Python 3.5 or newer](https://www.python.org/downloads/) (Make sure you allow it to modify your Windows PATH environment variable upon installation)
 2. [3Dmigoto 1.3.14 or newer](https://github.com/bo3b/3Dmigoto/releases/) (You just need "3Dmigoto-1.3.\*.zip")
 
+    **Warning:** The version ordering on the releases page is not completely chronological due to the way the file names are sorted, ensure that you are downloading the latest version by file name, not order in the list.
+
 Installation: 
 
 1. Download a zip file of 3Dmigoto and save it to \<Steam Installation Location\>\SteamApps\common\ACE COMBAT 7.
