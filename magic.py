@@ -197,7 +197,24 @@ if not tdm_list:
     wait = input('ERROR: 3Dmigoto zip file not found. Press any key to close.')
     sys.exit(0)
 
-tdm_zip = tdm_list[0]
+# We want to make sure the version is >= 1.3.16. 
+# Regex performance is better for subtitle handling in that version.
+tdm_zip = None
+for t in tdm_list:
+    version_numbers = t[t.find('-') + 1 : t.rfind('.')]
+    version_numbers = version_numbers.split('.')
+
+    if  int(version_numbers[0]) >= 1 and \
+        int(version_numbers[1]) >= 3 and \
+        int(version_numbers[2]) >= 16:
+
+        tdm_zip = t
+        break
+
+if tdm_zip is None:
+    wait = input('ERROR: 3Dmigoto zip version must be >= 1.3.16. Press any key to close.')
+    sys.exit(0)
+
 tdm_dir = tdm_zip[:tdm_zip.rfind('.')]
 
 # Unpack 3Dmigoto.
