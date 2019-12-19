@@ -19,7 +19,7 @@ This developer holds no responsibility if this happens to you!
 Prerequisites:
 
 1. [Python 3.5 or newer](https://www.python.org/downloads/) (Make sure you allow it to modify your Windows PATH environment variable upon installation)
-2. [3Dmigoto 1.3.14 or newer](https://github.com/bo3b/3Dmigoto/releases/) (You just need "3Dmigoto-1.3.\*.zip")
+2. [3Dmigoto 1.3.16 or newer](https://github.com/bo3b/3Dmigoto/releases/) (You just need "3Dmigoto-1.3.\*.zip")
 
     **Warning:** The order of releases on the 3Dmigoto page is not completely chronological due to the way the file names are sorted, ensure that you are downloading the latest version by file name, not order in the list.
 
