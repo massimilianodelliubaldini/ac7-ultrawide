@@ -112,7 +112,7 @@ while attempts >= 0:
         attempts -= 1
 
 # The value '41 2C 01 4C 89 CB 0F 29' is only found once in the EXE.
-exe_data = exe_data.replace(bytes.fromhex('41 2C 01 4C 89 CB 0F 29'), bytes.fromhex('41 2C 00 4C 89 CB 0F 29')) # Removes black bars.
+exe_data = exe_data.replace(bytes.fromhex('48 81 EC D0 00 00 00 F6 41 2C 01'), bytes.fromhex('48 81 EC D0 00 00 00 F6 41 2C 00')) # Removes black bars.
 
 # '35 FA 0E' is the default FOV value we want to replace, but it is found several times in the EXE, and we only want to replace it once. 
 # How do we know which one to replace? '3C D8 F5' happens to follow that value at the FOV address, and it doesn't follow any other addresses with the same value.
