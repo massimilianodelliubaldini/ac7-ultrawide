@@ -1,4 +1,4 @@
-import sys, os, shutil, binascii, zipfile, ctypes, math, glob, time
+import sys, os, shutil, binascii, zipfile, subprocess, math, glob, time
 from datetime import datetime
 
 # Must be in game root folder.
@@ -18,10 +18,24 @@ while prompt.lower() != 'y':
         sys.exit(0)
 
 # Get resolution from OS.
-u32 = ctypes.windll.user32
-u32.SetProcessDPIAware()
+if sys.platform == 'win32':
+    from win32api import GetSystemMetrics
+    your_total_width = GetSystemMetrics(0)
+    your_total_height = GetSystemMetrics(1)
+elif sys.platform.startswith('linux'):
+    cmd = ['xrandr']
+    cmd2 = ['grep', '*']
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    p2 = subprocess.Popen(cmd2, stdin=p.stdout, stdout=subprocess.PIPE)
+    p.stdout.close()
 
-[your_total_width, your_total_height] = [u32.GetSystemMetrics(0), u32.GetSystemMetrics(1)]
+    resolution_string, junk = p2.communicate()
+    resolution = resolution_string.split()[0]
+    your_total_width, your_total_height = map(int, resolution.split(b'x'))
+else:
+    print('Unsupported OS.')
+    sys.exit(0)
+
 your_aspect_ratio = your_total_width / your_total_height
 
 # Game calculates positions as if your monitor was always 1080p. These values are useful for those calculations.
