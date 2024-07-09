@@ -23,11 +23,15 @@ Prerequisites:
 
     **Warning:** The order of releases on the 3Dmigoto page is not completely chronological due to the way the file names are sorted, ensure that you are downloading the latest version by file name, not order in the list.
 
+3. [Steamless](https://github.com/atom0s/Steamless) 
 Installation: 
 
 1. Download a zip file of 3Dmigoto and save it to \<Steam Installation Location\>\SteamApps\common\ACE COMBAT 7.
 2. Clone this repository to, or download a zip and unpack it in, \<Steam Installation Location\>\SteamApps\common\ACE COMBAT 7.
-3. Double magic.py click to run.
+3. Place Steamless wherever you want
+4. Open Steamless.exe select Ace7Game.exe and click unpack file
+5. Backup old Ace7Game.exe and rename the unpacked exe to Ace7Game.exe
+6. Double magic.py click to run.
 
 Uninstallation:
 

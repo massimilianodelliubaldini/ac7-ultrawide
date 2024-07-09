@@ -1,6 +1,10 @@
 import sys, os, shutil, binascii, zipfile, ctypes, math, glob, time
 from datetime import datetime
 
+# Sets it to the correct directory, it wants to do system32 for me every time - Hydraxon
+script_dir = os.path.dirname(os.path.realpath(__file__))
+os.chdir(script_dir)
+
 # Must be in game root folder.
 if not os.path.isfile('Ace7Game.exe'):
     wait = input('ERROR: Ace7Game.exe not found in this folder. Press any key to close...')
